@@ -201,7 +201,30 @@ set (subset_project_headers ${HB_SUBSET_headers})
 
 ## Find and include needed header folders and libraries
 if (HB_HAVE_FREETYPE)
-  include (FindFreetype)
+  find_path(FREETYPE_INCLUDE_DIRS
+      NAMES ft2build.h
+      HINTS $ENV{FREETYPE_DIR}/include/freetype2
+          ${CMAKE_INSTALL_PREFIX}/include/freetype2
+      PATHS /usr/local/include/freetype2
+          /usr/include/freetype2
+      NO_CMAKE_FIND_ROOT_PATH
+  )
+  find_library(
+      FREETYPE_LIBRARIES
+      NAMES freetype
+      HINTS $ENV{FREETYPE_DIR}/lib
+          ${CMAKE_INSTALL_PREFIX}/lib
+          ${CMAKE_INSTALL_PREFIX}/lib64
+      PATHS /usr/local/lib
+          /usr/lib
+          /usr/lib64
+      NO_CMAKE_FIND_ROOT_PATH
+  )
+  
+  if(FREETYPE_INCLUDE_DIRS AND FREETYPE_LIBRARIES)
+      set(FREETYPE_FOUND TRUE)
+  endif()
+
   if (NOT FREETYPE_FOUND)
     message(FATAL_ERROR "HB_HAVE_FREETYPE was set, but we failed to find it. Maybe add a CMAKE_PREFIX_PATH= to your Freetype2 install prefix")
   endif ()
